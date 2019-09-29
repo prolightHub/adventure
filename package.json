@@ -1,0 +1,29 @@
+{
+  "name": "com.example.adventure",
+  "version": "1.0.0",
+  "description": "This is the project created from the Phaser 3 template",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "license": "ISC",
+  "displayName": "adventure",
+  "dependencies": {
+    "cordova-browser": "^5.0.4"
+  },
+  "cordova": {
+    "platforms": [
+      "browser"
+    ],
+    "plugins": {
+      "cordova-plugin-whitelist": {},
+      "cordova-plugin-browsersync": {}
+    }
+  },
+  "devDependencies": {
+    "cordova-plugin-browsersync": "^1.1.0",
+    "cordova-plugin-whitelist": "^1.3.4"
+  }
+}
