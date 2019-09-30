@@ -40,16 +40,15 @@ export default class MainScene extends Phaser.Scene {
             {
                 return;
             }
+            
+            var fxScene = this.scene.get("fxScene");
 
-            this.cameras.main.once('camerafadeoutcomplete', function (camera) 
+            fxScene.fadeIO(1000, () =>
             {
-                camera.fadeIn(800, 0);
-
                 this.scene.start("play");
                 this.cutScening = false;
-            }, this);
-        
-            this.cameras.main.fadeOut(400, 0);
+            });
+            
             this.cutScening = true;
         });
 

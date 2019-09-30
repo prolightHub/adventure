@@ -7,13 +7,14 @@ export default class Player {
         this.sprite = scene.physics.add.sprite(x, y, "player");
 
         this.sprite.setDrag(100, 0).setMaxVelocity(250, 600).setDrag(100, 20);
+        this.sprite.isPlayer = true;
       
         this.keys = scene.input.keyboard.createCursorKeys();
     }
 
     update ()
     {   
-        if(this.dead)
+        if(this.dead || this.goingThroughDoor)
         {
             return;
         }
@@ -55,9 +56,12 @@ export default class Player {
                 break;
 
             case "door":
-                if(this.keys.down.isDown)
+                if(this.keys.down.isDown && this.sprite.body.onFloor())
                 {
-                    
+                    this.goingThroughDoor = true;
+                    this.touchedObject = object;
+
+                    this.sprite.body.stop();
                 }
                 break;
         }
@@ -72,5 +76,17 @@ export default class Player {
     revive()
     {
         this.dead = false;
+    }
+
+    reset()
+    {
+         /* 
+            Reset sum stats...
+            Important! calling revive may need to be changed in the
+            future due to refilling the player's health when going through a door.
+        */
+       this.revive();
+       this.goingThroughDoor = false;
+       delete this.touchedObject;
     }
 }

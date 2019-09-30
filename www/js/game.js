@@ -19,11 +19,24 @@ var Game = (function()
 
         gameOver (that, player, levelHandler)
         {
+            levelHandler.levelName = levelHandler.lastSpawnPointLevel || levelHandler.levelName;
+
+            levelHandler.travelType = "spawnPoint";
+
             player.sprite.destroy();
+            that.scene.restart();
+        }
+
+        nextLevel (that, player, levelHandler, touchedObject)
+        {
+            const [ doorLevel, doorSymbol ] = touchedObject.obj.properties;
+
+            levelHandler.levelName = doorLevel.value;
+            levelHandler.doorSymbol = doorSymbol.value;
+
+            levelHandler.travelType = "door";
 
             that.scene.restart();
-
-            // player.revive();
         }
     }
 

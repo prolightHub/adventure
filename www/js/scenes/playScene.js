@@ -34,13 +34,33 @@ export default class PlayScene extends Phaser.Scene {
         levelHandler.blockLayer = levelHandler.level.createDynamicLayer("World", [levelHandler.defaultTiles], 0, 0);
         levelHandler.blockLayer.setCollisionByExclusion([-1, TILES.LAVA, TILES.DOOR1, TILES.DOOR2]);
 
-        // Create player at the spawn point then make him collide and finally revive him.
-        const spawnPoint = levelHandler.level.findObject("Objects", obj => obj.name === "Player Spawn Point");
+        // Create player at the spawn point or door then make him collide and finally revive him.
+
+        let spawnPoint = {};
+
+        switch(levelHandler.travelType)
+        {
+            case "spawnPoint":
+                spawnPoint = levelHandler.level.findObject("Objects", obj => obj.name === "Player Spawn Point");
+                levelHandler.lastSpawnPointLevel = levelHandler.levelName;
+                break;
+
+            case "door":
+                levelHandler.level.findObject("Objects", obj => 
+                {    
+                    // We found a match
+                    if(obj.type === "door" && obj.name.replace("Door", "").replace("door", "") === levelHandler.doorSymbol)
+                    {
+                        spawnPoint.x = obj.x + 16;
+                        spawnPoint.y = obj.y + 32;
+                    }
+                });
+                break;
+        }
+
         this.player = new Player(this, spawnPoint.x, spawnPoint.y);
         this.player.sprite.body.setCollideWorldBounds(true);
-        this.player.revive();
-
-
+        this.player.reset();
 
         // Add a collider for the block layer and the player and
         // have the camera start following the player
@@ -52,17 +72,18 @@ export default class PlayScene extends Phaser.Scene {
             this.player.onCollide.apply(this.player, [objectB, "lava"]);
         }, this);
 
-        var doors = {};
         levelHandler.level.findObject("Objects", obj => 
         {    
             if(obj.type === "door")
             {
-                doors[obj.name] = obj;
+                var object = this.physics.add.sprite(obj.x, obj.y, "door").setOrigin(0, 0).setDepth(-1);
+                object.body.moves = false;
 
-                obj.object = this.physics.add.sprite(obj.x, obj.y, "door").setOrigin(0, 0).setDepth(-1);
-                obj.object.body.moves = false;
+                object.setVisible(false);
 
-                this.physics.add.overlap(this.player.sprite, obj.object, function(objectA, objectB)
+                object.obj = obj;
+
+                this.physics.add.overlap(this.player.sprite, object, function(objectA, objectB)
                 {
                     this.player.onCollide.apply(this.player, [objectB, "door"]);
                 }, 
@@ -93,30 +114,27 @@ export default class PlayScene extends Phaser.Scene {
                 game.gameOver(this, this.player, levelHandler);
             });
         }
-    }
-
-    fadeIO (duration, func)
-    {
-        var halfTime = duration / 2;
-
-        var cam = this.cameras.main;
-
-        cam.once("camerafadeoutcomplete", () =>
+        if(this.player.goingThroughDoor)
         {
-            cam.fadeIn(halfTime, 0);
-
-            func(cam);
-
-            levelHandler.busy = false;
-        });
-
-        cam.fadeOut(halfTime, 0);
-
-        levelHandler.busy = true;
+            this.fadeIO(1000, () =>
+            {
+                game.nextLevel(this, this.player, levelHandler, this.player.touchedObject);
+            });
+        }
+        
     }
 
     render ()
     {
         
+    }
+
+    fadeIO (duration, func)
+    {
+        var fxScene = this.scene.get("fxScene");
+
+        fxScene.fadeIO(duration, func);
+
+        levelHandler.busy = true;
     }
 }

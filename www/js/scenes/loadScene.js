@@ -28,12 +28,14 @@ export default class LoadScene extends Phaser.Scene {
 
     create()
     {
-        
+        this.scene.switch("main");
+        this.scene.launch("fxScene");
+
     }
 
     update()
     {
-        this.scene.switch("main");
+        
     }
 
     render()
