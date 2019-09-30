@@ -6,29 +6,12 @@ export default class MainScene extends Phaser.Scene {
 
     constructor ()
     {
-        super({
-            key: "main",
-            pack: {
-                files: [{
-                    type: 'plugin',
-                    key: 'rexwebfontloaderplugin',
-                    url: './js/plugins/rexwebfontloaderplugin.min.js',
-                    start: true
-                }]
-            }
-        });
+        super("main");
     }
 
     preload ()
     {
-        this.plugins.get('rexwebfontloaderplugin').addToScene(this);
-
-        var config = {
-            google: {
-                families: ['Bangers']
-            }
-        };
-        this.load.rexWebFont(config);
+        
     }
 
     create ()
