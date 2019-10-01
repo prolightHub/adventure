@@ -51,7 +51,7 @@ function Button(origin, x, y, width, height, color, text, style, onClick)
     this.draw = function(graphics)
     {
         graphics.fillStyle((typeof this.color === "number") ? this.color : this.color.color32);
-        graphics.fillRoundedRect(this.text.x - this.halfWidth * this.offsetX, this.text.y - this.halfHeight * this.offsetY, this.width, this.height, this.round || 4);
+        graphics.fillRoundedRect(this.text.x - this.halfWidth * this.offsetX, this.text.y - this.halfHeight * this.offsetY, this.width, this.height, this.round || 0);
     };
 
     this.isClicked = function(x, y)

@@ -10,9 +10,19 @@ export default class Player {
         this.sprite.isPlayer = true;
       
         this.keys = scene.input.keyboard.createCursorKeys();
+
+        // Hp, must be in multiples of 4
+        this.maxHp = 12;
+        this.hp = 12;
+
+        this.lastHurtTime = 0;
+        this.hurtInterval = 1000;
+
+        this.lastBlinkTime = 0;
+        this.blinkInterval = 50;
     }
 
-    update ()
+    update (time, delta)
     {   
         if(this.dead || this.goingThroughDoor)
         {
@@ -41,18 +51,38 @@ export default class Player {
             sprite.body.setVelocityY(-jumpHeight);
         }
 
-        if(sprite.y > levelHandler.blockLayer.height + sprite.height)
+        if(sprite.y > levelHandler.blockLayer.height + sprite.height ||
+            this.hp <= 0)
         {
             this.kill();
         }
+
+        if(time - this.lastHurtTime < this.hurtInterval)
+        {
+            if(time - this.lastBlinkTime >= this.blinkInterval)
+            {
+                this.sprite.setVisible(!this.sprite._visible);
+
+                this.lastBlinkTime = time;
+            }
+        }else{
+            this.sprite.setVisible(true);
+        }
     }
 
-    onCollide (object, type)
+    onCollide (object, type, time)
     {
         switch(type)
         {
             case "lava":
-                this.kill();
+                // this.kill();
+
+                if(time - this.lastHurtTime >= this.hurtInterval)
+                {
+                    this.hp--;
+
+                    this.lastHurtTime = time;
+                }
                 break;
 
             case "door":
@@ -67,26 +97,39 @@ export default class Player {
         }
     }
 
-    kill()
+    kill ()
     {
         this.sprite.body.stop();
         this.dead = true;
     }
 
-    revive()
+    revive ()
     {
         this.dead = false;
+        this.hp = this.maxHp;
     }
 
-    reset()
+    reset (travelType)
     {
-         /* 
+        /* 
             Reset sum stats...
             Important! calling revive may need to be changed in the
             future due to refilling the player's health when going through a door.
         */
-       this.revive();
-       this.goingThroughDoor = false;
-       delete this.touchedObject;
+
+        if(travelType === "spawnPoint")
+        {
+            this.revive();
+        }
+
+        this.goingThroughDoor = false;
+        delete this.touchedObject;
+    }
+
+    copyOverStats (newPlayer)
+    {
+        // Copy over anything that matters.
+        newPlayer.hp = this.hp;
+        newPlayer.dead = this.dead;
     }
 }

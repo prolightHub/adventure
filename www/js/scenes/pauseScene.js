@@ -5,6 +5,8 @@ var graphics;
 var pauseMenu = {};
 var img;
 
+/* TODO: fix the fading in the pause scene to the main scene and the main scene to the play scene */
+
 export default class PauseScene extends Phaser.Scene {
 
     constructor ()
@@ -43,13 +45,31 @@ export default class PauseScene extends Phaser.Scene {
                 this.scene.stop("play");
                 this.scene.start("main");
 
-                camera.fadeIn(800, 0);
+                camera.fadeIn(500, 0);
                 this.cutScening = false;
             }, this);
         
-            this.cameras.main.fadeOut(400, 0);
+            this.cameras.main.fadeOut(500, 0);
             this.cutScening = true;
         });
+
+        this.input.keyboard.on("keydown-P", function(event)
+        {
+            if(!this.cutScening)
+            {
+                this.cameras.main.once('camerafadeoutcomplete', function (camera) 
+                {
+                    camera.fadeIn(500, 0);
+
+                    this.scene.start("play");
+
+                    this.cutScening = false;
+                }, this);
+            
+                this.cameras.main.fadeOut(500, 0);
+                this.cutScening = true;
+            }
+        }, this);
 
         this.input.on("pointerdown", function(pointer)
         {
@@ -57,14 +77,14 @@ export default class PauseScene extends Phaser.Scene {
             {
                 this.cameras.main.once('camerafadeoutcomplete', function (camera) 
                 {
-                    camera.fadeIn(800, 0);
+                    camera.fadeIn(500, 0);
 
                     this.scene.start("play");
 
                     this.cutScening = false;
                 }, this);
             
-                this.cameras.main.fadeOut(400, 0);
+                this.cameras.main.fadeOut(500, 0);
                 this.cutScening = true;
             }
 

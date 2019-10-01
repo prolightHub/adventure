@@ -17,6 +17,15 @@ var Game = (function()
 
         }
 
+        pause (that)
+        {
+            that.scene.get("fxScene").fadeIO(1000, function()
+            {
+                that.scene.pause();
+                that.scene.launch("pause");
+            });
+        }
+
         gameOver (that, player, levelHandler)
         {
             levelHandler.levelName = levelHandler.lastSpawnPointLevel || levelHandler.levelName;
@@ -36,6 +45,7 @@ var Game = (function()
 
             levelHandler.travelType = "door";
 
+            that.lastPlayer = player;
             that.scene.restart();
         }
     }
