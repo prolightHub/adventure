@@ -1,4 +1,3 @@
-import levelHandler from "./utils/levelUtils.js";
 
 var Game = (function() 
 {
@@ -26,7 +25,7 @@ var Game = (function()
             this.gameStarted = true;
         } 
 
-        restore (that, player)
+        restore (that, player, levelHandler)
         {
             if(levelHandler.playerInfo)
             {
@@ -46,7 +45,32 @@ var Game = (function()
             levelHandler.playerInfo = {};
 
             levelHandler.playerInfo.hp = player.hp;
-            levelHandler.playerInfo.max = player.max;
+            levelHandler.playerInfo.maxHp = player.maxHp;
+
+            this.trueSave(that, player, levelHandler);
+        }
+
+        trueSave (that, player, levelHandler)
+        {
+            localforage.setItem("adventure-saveData", JSON.stringify({
+                player: levelHandler.playerInfo,
+                checkPoint: levelHandler.checkPointInfo
+            }));
+        }
+
+        trueRestore (that, player, levelHandler)
+        {
+            // Ugh this slow functions won't let anything in levelHandler be defined immediately.
+            localforage.getItem("adventure-saveData", function(err, value)
+            { 
+                console.log(value);
+
+                value = JSON.parse(value);
+                // console.log(object)
+
+                levelHandler.playerInfo = (value.player);
+                levelHandler.checkPointInfo = (value.checkPoint);
+            });
         }
 
         pause (that)
@@ -104,5 +128,3 @@ var Game = (function()
 })();
 
 export default Game.GetInstance();
-
-

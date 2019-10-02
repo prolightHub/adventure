@@ -45,9 +45,15 @@ export default class PlayScene extends Phaser.Scene {
 
         // Create player at the spawn point or door then make him collide and finally revive him.
 
-        let spawnPoint = {};
+        // if(levelHandler.travelType === "checkPoint" || levelHandler.travelType === "spawnPoint")
+        // {
+        //     game.trueRestore(this, null, levelHandler);
+        //     levelHandler.travelType = "checkPoint";
+        // }
 
-        console.log(levelHandler.travelType);
+        // console.log(levelHandler.checkPointInfo);
+
+        let spawnPoint = {};
 
         switch(levelHandler.travelType)
         {
@@ -80,7 +86,7 @@ export default class PlayScene extends Phaser.Scene {
 
         if(levelHandler.travelType === "checkPoint" || levelHandler.travelType === "spawnPoint")
         {
-            game.restore(this, this.player);
+            game.restore(this, this.player, levelHandler);
         }
 
         // Because I can't think of a better way to do it.

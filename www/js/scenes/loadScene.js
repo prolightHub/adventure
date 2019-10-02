@@ -17,7 +17,7 @@ export default class LoadScene extends Phaser.Scene {
     preload()
     {
         this.plugins.get('rexwebfontloaderplugin').addToScene(this);
-
+        
         var config = {
             google: {
                 families: ['Bangers']
