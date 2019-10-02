@@ -25,25 +25,37 @@ export default class PlayScene extends Phaser.Scene {
         this.load.image("heart1", 'assets/images/heart1.png');        
         this.load.image("heart2", 'assets/images/heart2.png');        
         this.load.image("heart3", 'assets/images/heart3.png');        
-        this.load.image("heart4", 'assets/images/heart4.png');        
+        this.load.image("heart4", 'assets/images/heart4.png');       
+        
+        this.load.audio("hit", "assets/sounds/hit.wav");
     }
 
     create ()
     {
-        levelHandler.busy = true;
+        // levelHandler.busy = true;
+
+        this.sounds = {};
+        this.sounds.hit = this.sound.add('hit');
 
         // Create level stuff
         levelHandler.level = this.make.tilemap({ key: levelHandler.levelName });
         levelHandler.defaultTiles = levelHandler.level.addTilesetImage("defaultTiles", "defaultTiles");
         levelHandler.blockLayer = levelHandler.level.createDynamicLayer("World", [levelHandler.defaultTiles], 0, 0);
-        levelHandler.blockLayer.setCollisionByExclusion([-1, TILES.LAVA, TILES.DOOR1, TILES.DOOR2]);
+        levelHandler.blockLayer.setCollisionByExclusion([-1, TILES.LAVA, TILES.DOOR1, TILES.DOOR2, TILES.CHECKPOINT, TILES.CHECKPOINTUNSAVED]);
 
         // Create player at the spawn point or door then make him collide and finally revive him.
 
         let spawnPoint = {};
 
+        console.log(levelHandler.travelType);
+
         switch(levelHandler.travelType)
         {
+            case "checkPoint":
+                    spawnPoint.x = levelHandler.checkPointInfo.col * 32 + 16;
+                    spawnPoint.y = levelHandler.checkPointInfo.row * 32 + 16;
+                    break;
+
             case "spawnPoint":
                 spawnPoint = levelHandler.level.findObject("Objects", obj => obj.name === "Player Spawn Point");
                 levelHandler.lastSpawnPointLevel = levelHandler.levelName;
@@ -66,6 +78,11 @@ export default class PlayScene extends Phaser.Scene {
         this.player.sprite.body.setCollideWorldBounds(true);
         this.player.reset(levelHandler.travelType);
 
+        if(levelHandler.travelType === "checkPoint" || levelHandler.travelType === "spawnPoint")
+        {
+            game.restore(this, this.player);
+        }
+
         // Because I can't think of a better way to do it.
         if(this.lastPlayer && levelHandler.travelType === "door")
         {
@@ -79,7 +96,14 @@ export default class PlayScene extends Phaser.Scene {
 
         levelHandler.blockLayer.setTileIndexCallback(TILES.LAVA, function(objectA, objectB)
         {
-            this.player.onCollide.apply(this.player, [objectB, "lava", this.time.now]);
+            this.player.onCollide.apply(this.player, [objectB, "lava", this.time.now, this]);
+        }, this);
+
+        levelHandler.blockLayer.setTileIndexCallback(TILES.CHECKPOINTUNSAVED, function(objectA, objectB)
+        {
+            levelHandler.blockLayer.putTileAt(TILES.CHECKPOINT, objectB.x, objectB.y);
+
+            this.player.onCollide.apply(this.player, [objectB, "checkPoint", this.time.now, this]);
         }, this);
 
         levelHandler.level.findObject("Objects", obj => 

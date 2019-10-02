@@ -26,7 +26,7 @@ export default class PauseScene extends Phaser.Scene {
         img = this.add.sprite(400, 240, "");
         img.visible = false;
 
-        buttons.menu = new Button(this, 400, 230, 120, 40, new Phaser.Display.Color(0, 140, 40), "Menu", 
+        buttons.menu = new Button(this, 400, 240, 120, 40, new Phaser.Display.Color(0, 140, 40), "Menu", 
         {
             fontSize: '20px',
             fill: '#FFFFFF',
@@ -40,16 +40,17 @@ export default class PauseScene extends Phaser.Scene {
                 return;
             }
 
-            this.cameras.main.once('camerafadeoutcomplete', function (camera) 
+            this.scene.get("fxScene").fadeIO(1000, () =>
             {
-                this.scene.stop("play");
+                this.scene.stop("pause");
+                this.scene.pause("play");
                 this.scene.start("main");
 
-                camera.fadeIn(500, 0);
+                this.scene.sendToBack("play");
+
                 this.cutScening = false;
-            }, this);
-        
-            this.cameras.main.fadeOut(500, 0);
+            });
+
             this.cutScening = true;
         });
 
@@ -57,34 +58,30 @@ export default class PauseScene extends Phaser.Scene {
         {
             if(!this.cutScening)
             {
-                this.cameras.main.once('camerafadeoutcomplete', function (camera) 
+                this.scene.get("fxScene").fadeIO(1000, () =>
                 {
-                    camera.fadeIn(500, 0);
-
-                    this.scene.start("play");
+                    this.scene.stop("pause");
+                    this.scene.resume("play");
 
                     this.cutScening = false;
-                }, this);
-            
-                this.cameras.main.fadeOut(500, 0);
+                });
+
                 this.cutScening = true;
             }
         }, this);
 
         this.input.on("pointerdown", function(pointer)
         {
-            if(!this.cutScening && (pointer.x < 150 || pointer.x > 510))
+            if(!this.cutScening && (pointer.x < 150 || pointer.x > 660))
             {
-                this.cameras.main.once('camerafadeoutcomplete', function (camera) 
+                this.scene.get("fxScene").fadeIO(1000, () =>
                 {
-                    camera.fadeIn(500, 0);
-
-                    this.scene.start("play");
+                    this.scene.stop("pause");
+                    this.scene.resume("play");
 
                     this.cutScening = false;
-                }, this);
-            
-                this.cameras.main.fadeOut(500, 0);
+                });
+
                 this.cutScening = true;
             }
 
@@ -100,7 +97,7 @@ export default class PauseScene extends Phaser.Scene {
         {
             var textureManager = this.textures;
 
-            if (textureManager.exists('area'))
+            if(textureManager.exists('area'))
             {
                 textureManager.remove('area');
             }

@@ -1,4 +1,5 @@
 import levelHandler from "../utils/levelUtils.js";
+import game from "../game.js";
 
 export default class Player {
 
@@ -19,7 +20,7 @@ export default class Player {
         this.hurtInterval = 1000;
 
         this.lastBlinkTime = 0;
-        this.blinkInterval = 50;
+        this.blinkInterval = 100;
     }
 
     update (time, delta)
@@ -51,8 +52,7 @@ export default class Player {
             sprite.body.setVelocityY(-jumpHeight);
         }
 
-        if(sprite.y > levelHandler.blockLayer.height + sprite.height ||
-            this.hp <= 0)
+        if(sprite.y > levelHandler.blockLayer.height + sprite.height || this.hp <= 0)
         {
             this.kill();
         }
@@ -70,19 +70,23 @@ export default class Player {
         }
     }
 
-    onCollide (object, type, time)
+    onCollide (object, type, time, that)
     {
         switch(type)
         {
             case "lava":
-                // this.kill();
-
                 if(time - this.lastHurtTime >= this.hurtInterval)
                 {
                     this.hp--;
 
+                    that.sounds.hit.play();
+
                     this.lastHurtTime = time;
                 }
+                break;
+
+            case "checkPoint":
+                game.save(that, this, levelHandler, object);
                 break;
 
             case "door":

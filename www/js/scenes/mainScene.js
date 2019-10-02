@@ -2,6 +2,8 @@
 var buttons = createButtons();
 var graphics;
 
+import game from "../game.js";
+
 export default class MainScene extends Phaser.Scene {
 
     constructor ()
@@ -41,11 +43,10 @@ export default class MainScene extends Phaser.Scene {
                 return;
             }
             
-            var fxScene = this.scene.get("fxScene");
-
-            fxScene.fadeIO(1000, () =>
+            this.scene.get("fxScene").fadeIO(1000, () =>
             {
-                this.scene.start("play");
+                game.start(this);
+
                 this.cutScening = false;
             });
             
@@ -62,6 +63,9 @@ export default class MainScene extends Phaser.Scene {
     update ()
     {
         graphics.clear();
+
+        graphics.fillStyle(0x36B0C1);
+        graphics.fillRect(0, 0, window.config.width, window.config.height);
 
         buttons.draw(graphics);
 
